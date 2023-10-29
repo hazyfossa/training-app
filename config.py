@@ -12,7 +12,5 @@ config = {
     "validate_phone": bool(getenv("VALIDATE_PHONE", True)),
     "phone_regex": getenv(
         "PHONE_REGEX", r"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"
-    ),
-    # Graphene settings
-    "query_on_mutation": bool(getenv("QUERY_ON_MUTATION", False)),
+    )
 }
