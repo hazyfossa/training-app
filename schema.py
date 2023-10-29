@@ -5,7 +5,18 @@ from tinydb import TinyDB, where
 from tinydb.operations import add
 from tinydb.table import Document
 
-from graphene import ID, Field, Float, Int, List, Mutation, ObjectType, Schema, String
+from graphene import (
+    ID,
+    Field,
+    Float,
+    Int,
+    List,
+    Mutation,
+    ObjectType,
+    Schema,
+    String,
+    Boolean,
+)
 from graphene.types.objecttype import ObjectTypeMeta
 
 from scalars import Email, Phone
@@ -191,6 +202,27 @@ class MakePurchase(Mutation):
         return MakePurchase(training, customer, Document(purchase, purchaseId))
 
 
+# Deletion
+
+
+class SchemaObject(GrapheneEnum):
+    Gym = "gyms"
+    Customer = "customers"
+    Training = "trainings"
+
+
+class Delete(Mutation):
+    class Arguments:
+        id = ID(required=True)
+        object = SchemaObject(required=True)
+
+    ok = Boolean(required=True)
+
+    def mutate(parent, info, id, object):
+        db[object.value].remove(doc_ids=[int(id)])
+        return Delete(True)
+
+
 # Query
 
 
@@ -243,6 +275,7 @@ mutation_class = compose_mutations(
         CreateCustomer,
         UpdateCustomer,
         MakePurchase,
+        Delete,
     ]
 )
 
