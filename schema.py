@@ -167,7 +167,7 @@ class Purchase(TinyDBObject):
         return db["trainings"].get(doc_id=parent["training"])["price"]
 
 
-class MakePurchase(Mutation):  # TODO
+class MakePurchase(Mutation):
     class Arguments:
         customerId = ID(required=True)
         trainingId = ID(required=True)
