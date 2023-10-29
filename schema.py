@@ -2,7 +2,7 @@ from enum import Enum
 from graphene import Enum as GrapheneEnum
 
 from tinydb import TinyDB, where
-from tinydb.operations import add
+from tinydb.operations import add, subtract
 from tinydb.table import Document
 
 from graphene import (
@@ -44,7 +44,8 @@ class Gym(TinyDBObject):
     name = String(required=True)
     admin_name = String(required=True)
     admin_phone = Phone(required=True)
-    trainings = List(lambda: Training())
+    trainings = List(lambda: Training(), required=True)
+    free_slots = Int(required=True)
 
     def resolve_trainings(parent, info):
         return [db["trainings"].get(doc_id=id) for id in parent["trainings"]]
@@ -58,6 +59,7 @@ class CreateGym(Mutation):
         admin_name = String(required=True)
         admin_phone = Phone(required=True)
         trainings = List(ID, required=True, default_value=[])
+        free_slots = Int(required=True)
 
     def mutate(parent, info, **gym):
         id = db["gyms"].insert(gym)
@@ -73,6 +75,7 @@ class UpdateGym(Mutation):
         admin_name = String()
         admin_phone = Phone()
         trainings = List(ID)
+        free_slots = Int()
 
     def mutate(parent, info, id, **gym):
         db["gyms"].update(gym, doc_ids=[int(id)])
@@ -189,6 +192,10 @@ class MakePurchase(Mutation):
 
     def mutate(parent, info, customerId, trainingId):
         training = db["trainings"].get(doc_id=trainingId)
+
+        gymId = training["gym"]
+        db["gyms"].update(subtract("free_slots", 1), doc_ids=[int(gymId)])
+
         purchase = {
             "training": trainingId,
             "customer": customerId,
