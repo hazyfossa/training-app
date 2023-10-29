@@ -1,0 +1,4 @@
+graphene
+tinydb
+starlette-graphene3
+uvicorn
